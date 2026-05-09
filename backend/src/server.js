@@ -8,11 +8,20 @@ const crypto = require('crypto');
 
 const app = express();
 const corsOptions = {
-  origin: true, // reflect request origin (allow all)
+  origin: [
+    'http://localhost:3000',
+    'https://configtoapp-production.up.railway.app',
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+  ],
 };
+
+app.use(cors(corsOptions));
 
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
