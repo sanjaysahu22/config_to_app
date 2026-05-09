@@ -1,0 +1,26 @@
+{
+  "component": { "name": "WeatherDashboard" },
+  "state": [
+    { "name": "city", "initial": "'San Francisco'" },
+    { "name": "temp", "initial": "72" },
+    { "name": "condition", "initial": "'Sunny'" }
+  ],
+  "ui": {
+    "type": "div",
+    "className": "p-8 max-w-sm mx-auto bg-gradient-to-br from-blue-400 to-purple-500 rounded-3xl shadow-2xl text-white text-center mt-10",
+    "children": [
+      { "type": "h2", "className": "text-2xl font-bold mb-2", "text": "{city}" },
+      { "type": "div", "className": "text-6xl font-extrabold my-4", "text": "{temp}°F" },
+      { "type": "p", "className": "text-xl font-medium mb-8", "text": "{condition}" },
+      {
+        "type": "div",
+        "className": "flex gap-2 justify-center",
+        "children": [
+          { "type": "button", "className": "px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors", "onClick": "() => { setCity('New York'); setTemp(65); setCondition('Cloudy'); }", "label": "NY" },
+          { "type": "button", "className": "px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors", "onClick": "() => { setCity('Miami'); setTemp(80); setCondition('Humid'); }", "label": "MIA" },
+          { "type": "button", "className": "px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors", "onClick": "() => { setCity('Seattle'); setTemp(55); setCondition('Rainy'); }", "label": "SEA" }
+        ]
+      }
+    ]
+  }
+}

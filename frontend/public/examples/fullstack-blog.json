@@ -1,0 +1,72 @@
+{
+  "app": {
+    "name": "MicroBlogApp",
+    "description": "Fullstack blog built with Neon Postgres"
+  },
+  "entities": {
+    "Post": {
+      "fields": {
+        "id": { "type": "uuid", "unique": true, "default": "gen_random_uuid()" },
+        "title": { "type": "string", "required": true },
+        "content": { "type": "text", "required": true },
+        "author": { "type": "string" },
+        "likes": { "type": "integer", "default": "0" }
+      }
+    }
+  },
+  "state": [
+    { "name": "posts", "initial": "[]", "type": "any[]" }
+  ],
+  "effects": [
+    {
+      "onMount": true,
+      "body": [
+        "fetch('/api/posts').then(res => res.json()).then(setPosts)"
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "likePost",
+      "params": [{ "name": "id" }, { "name": "currentLikes" }],
+      "body": [
+        "fetch(`/api/posts/${id}`, {",
+        "  method: 'PUT',",
+        "  headers: { 'Content-Type': 'application/json' },",
+        "  body: JSON.stringify({ likes: currentLikes + 1 })",
+        "}).then(() => setPosts(posts.map(p => p.id === id ? { ...p, likes: currentLikes + 1 } : p)))"
+      ]
+    }
+  ],
+  "ui": {
+    "type": "div",
+    "className": "max-w-2xl mx-auto p-4 dark:bg-[#0c0c0e] min-h-screen text-gray-900 dark:text-gray-100",
+    "children": [
+      { "type": "h1", "className": "text-4xl font-extrabold mb-8 pt-10 text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600", "text": "Dev Blog DB" },
+      {
+        "type": "div",
+        "className": "space-y-6",
+        "map": { "over": "posts", "as": "post" },
+        "key": "post.id",
+        "children": [
+          {
+            "type": "div",
+            "className": "bg-white dark:bg-[#151518] p-6 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800",
+            "children": [
+              { "type": "h2", "className": "text-2xl font-bold dark:text-white mb-2", "text": "{post.title}" },
+              { "type": "p", "className": "text-sm text-gray-500 dark:text-gray-400 mb-4 font-mono", "text": "by {post.author || 'Anonymous'}" },
+              { "type": "p", "className": "text-gray-700 dark:text-gray-300 leading-relaxed mb-6", "text": "{post.content}" },
+              {
+                "type": "div",
+                "className": "flex items-center gap-3",
+                "children": [
+                  { "type": "button", "className": "flex items-center gap-2 px-4 py-2 bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 rounded-full hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-colors font-medium text-sm", "onClick": "() => likePost(post.id, post.likes)", "label": "❤️ Like ({post.likes})" }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

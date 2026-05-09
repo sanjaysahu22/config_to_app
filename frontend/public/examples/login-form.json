@@ -1,0 +1,43 @@
+{
+  "component": { "name": "LoginForm" },
+  "state": [
+    { "name": "email", "initial": "''" },
+    { "name": "password", "initial": "''" },
+    { "name": "submitted", "initial": "false" }
+  ],
+  "ui": {
+    "type": "div",
+    "className": "min-h-[400px] flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4",
+    "children": [
+      {
+        "type": "div",
+        "className": "bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md",
+        "children": [
+          { "type": "h2", "className": "text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center", "text": "Welcome Back" },
+          {
+            "type": "div",
+            "className": "space-y-4",
+            "children": [
+              {
+                "type": "div",
+                "children": [
+                  { "type": "label", "className": "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", "text": "Email" },
+                  { "type": "input", "className": "w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500", "bind": "email", "props": { "type": "email", "placeholder": "you@example.com" } }
+                ]
+              },
+              {
+                "type": "div",
+                "children": [
+                  { "type": "label", "className": "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", "text": "Password" },
+                  { "type": "input", "className": "w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500", "bind": "password", "props": { "type": "password", "placeholder": "••••••••" } }
+                ]
+              },
+              { "type": "button", "className": "w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors", "onClick": "() => setSubmitted(true)", "label": "Sign In" },
+              { "type": "p", "className": "text-center text-green-500 text-sm mt-4 font-medium transition-opacity {submitted ? 'opacity-100' : 'opacity-0'}", "text": "Logged in as {email}" }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

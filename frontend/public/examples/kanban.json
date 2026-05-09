@@ -1,0 +1,84 @@
+{
+  "component": { "name": "TaskBoard" },
+  "state": [
+    { "name": "tasks", "initial": "[{ id: 1, title: 'Learn Config UI', status: 'done' }, { id: 2, title: 'Build Examples', status: 'doing' }, { id: 3, title: 'Launch', status: 'todo' }]" }
+  ],
+  "functions": [
+    {
+      "name": "moveTask",
+      "params": [{ "name": "id" }, { "name": "status" }],
+      "body": ["setTasks(tasks.map(t => t.id === id ? { ...t, status } : t))"]
+    }
+  ],
+  "ui": {
+    "type": "div",
+    "className": "p-6 min-h-screen bg-gray-50 dark:bg-gray-900",
+    "children": [
+      { "type": "h1", "className": "text-2xl font-bold text-gray-900 dark:text-white mb-6", "text": "Kanban Board" },
+      {
+        "type": "div",
+        "className": "grid grid-cols-1 md:grid-cols-3 gap-6",
+        "children": [
+          {
+            "type": "div",
+            "className": "bg-gray-100 dark:bg-gray-800 p-4 rounded-xl",
+            "children": [
+              { "type": "h2", "className": "font-bold text-gray-700 dark:text-gray-300 mb-4", "text": "To Do" },
+              {
+                "type": "div",
+                "map": { "over": "tasks.filter(t => t.status === 'todo')", "as": "task" },
+                "key": "task.id",
+                "className": "bg-white dark:bg-gray-700 p-3 rounded-lg shadow-sm mb-3 flex justify-between items-center",
+                "children": [
+                  { "type": "span", "className": "text-sm text-gray-800 dark:text-gray-200", "text": "{task.title}" },
+                  { "type": "button", "className": "text-xs px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded hover:bg-blue-100 dark:hover:bg-blue-800/50", "onClick": "() => moveTask(task.id, 'doing')", "label": "Start ➔" }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "div",
+            "className": "bg-gray-100 dark:bg-gray-800 p-4 rounded-xl",
+            "children": [
+              { "type": "h2", "className": "font-bold text-gray-700 dark:text-gray-300 mb-4", "text": "Doing" },
+              {
+                "type": "div",
+                "map": { "over": "tasks.filter(t => t.status === 'doing')", "as": "task" },
+                "key": "task.id",
+                "className": "bg-white dark:bg-gray-700 p-3 rounded-lg shadow-sm mb-3 flex justify-between items-center border-l-2 border-blue-500",
+                "children": [
+                  { "type": "span", "className": "text-sm text-gray-800 dark:text-gray-200", "text": "{task.title}" },
+                  {
+                    "type": "div",
+                    "className": "flex gap-1",
+                    "children": [
+                      { "type": "button", "className": "text-xs px-2 py-1 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-600 rounded", "onClick": "() => moveTask(task.id, 'todo')", "label": "←" },
+                      { "type": "button", "className": "text-xs px-2 py-1 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded hover:bg-green-100 dark:hover:bg-green-800/50", "onClick": "() => moveTask(task.id, 'done')", "label": "Done ➔" }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "div",
+            "className": "bg-gray-100 dark:bg-gray-800 p-4 rounded-xl",
+            "children": [
+              { "type": "h2", "className": "font-bold text-gray-700 dark:text-gray-300 mb-4", "text": "Done" },
+              {
+                "type": "div",
+                "map": { "over": "tasks.filter(t => t.status === 'done')", "as": "task" },
+                "key": "task.id",
+                "className": "bg-white dark:bg-gray-700 p-3 rounded-lg shadow-sm mb-3 flex justify-between items-center opacity-70",
+                "children": [
+                  { "type": "span", "className": "text-sm text-gray-800 dark:text-gray-200 line-through", "text": "{task.title}" },
+                  { "type": "button", "className": "text-xs px-2 py-1 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-600 rounded", "onClick": "() => moveTask(task.id, 'doing')", "label": "← Reopen" }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

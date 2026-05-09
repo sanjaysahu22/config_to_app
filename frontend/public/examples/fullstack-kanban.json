@@ -1,0 +1,134 @@
+{
+  "app": {
+    "name": "FullstackKanban",
+    "description": "A fullstack Kanban board with a Postgres backend."
+  },
+  "entities": {
+    "Task": {
+      "fields": {
+        "id": { "type": "uuid", "unique": true, "default": "gen_random_uuid()" },
+        "title": { "type": "string", "required": true },
+        "status": { "type": "string", "default": "'todo'" },
+        "createdAt": { "type": "datetime", "default": "now()" }
+      }
+    }
+  },
+  "state": [
+    { "name": "tasks", "initial": "[]", "type": "any[]" },
+    { "name": "newTaskTitle", "initial": "''", "type": "string" }
+  ],
+  "effects": [
+    {
+      "onMount": true,
+      "body": [
+        "fetch('/api/tasks').then(res => res.json()).then(setTasks)"
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "addTask",
+      "body": [
+        "if (!newTaskTitle.trim()) return;",
+        "fetch('/api/tasks', {",
+        "  method: 'POST',",
+        "  headers: { 'Content-Type': 'application/json' },",
+        "  body: JSON.stringify({ title: newTaskTitle, status: 'todo' })",
+        "}).then(res => res.json()).then(newTask => {",
+        "  setTasks([...tasks, newTask]);",
+        "  setNewTaskTitle('');",
+        "})"
+      ]
+    },
+    {
+      "name": "moveTask",
+      "params": [{ "name": "id" }, { "name": "status" }],
+      "body": [
+        "fetch(`/api/tasks/${id}`, {",
+        "  method: 'PUT',",
+        "  headers: { 'Content-Type': 'application/json' },",
+        "  body: JSON.stringify({ status })",
+        "}).then(() => setTasks(tasks.map(t => t.id === id ? { ...t, status } : t)))"
+      ]
+    }
+  ],
+  "ui": {
+    "type": "div",
+    "className": "p-6 min-h-screen bg-gray-50 dark:bg-gray-900",
+    "children": [
+      { "type": "h1", "className": "text-2xl font-bold text-gray-900 dark:text-white mb-6", "text": "Fullstack Postgres Kanban" },
+      {
+        "type": "div",
+        "className": "mb-6 flex gap-2",
+        "children": [
+          { "type": "input", "className": "border rounded px-4 py-2 flex-grow dark:bg-gray-800 dark:text-white", "bind": "newTaskTitle", "props": { "placeholder": "Enter task title..." } },
+          { "type": "button", "className": "bg-blue-600 text-white px-4 py-2 rounded", "onClick": "addTask", "label": "Add Task" }
+        ]
+      },
+      {
+        "type": "div",
+        "className": "grid grid-cols-1 md:grid-cols-3 gap-6",
+        "children": [
+          {
+            "type": "div",
+            "className": "bg-gray-100 dark:bg-gray-800 p-4 rounded-xl",
+            "children": [
+              { "type": "h2", "className": "font-bold text-gray-700 dark:text-gray-300 mb-4", "text": "To Do" },
+              {
+                "type": "div",
+                "map": { "over": "tasks.filter(t => t.status === 'todo')", "as": "task" },
+                "key": "task.id",
+                "className": "bg-white dark:bg-gray-700 p-3 rounded-lg shadow-sm mb-3 flex justify-between items-center",
+                "children": [
+                  { "type": "span", "className": "text-sm text-gray-800 dark:text-gray-200", "text": "{task.title}" },
+                  { "type": "button", "className": "text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded", "onClick": "() => moveTask(task.id, 'doing')", "label": "Start ➔" }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "div",
+            "className": "bg-gray-100 dark:bg-gray-800 p-4 rounded-xl",
+            "children": [
+              { "type": "h2", "className": "font-bold text-gray-700 dark:text-gray-300 mb-4", "text": "Doing" },
+              {
+                "type": "div",
+                "map": { "over": "tasks.filter(t => t.status === 'doing')", "as": "task" },
+                "key": "task.id",
+                "className": "bg-white dark:bg-gray-700 p-3 rounded-lg shadow-sm mb-3 flex justify-between items-center border-l-2 border-blue-500",
+                "children": [
+                  { "type": "span", "className": "text-sm text-gray-800 dark:text-gray-200", "text": "{task.title}" },
+                  {
+                    "type": "div",
+                    "className": "flex gap-1",
+                    "children": [
+                      { "type": "button", "className": "text-xs px-2 py-1 text-gray-500 hover:bg-gray-100 rounded", "onClick": "() => moveTask(task.id, 'todo')", "label": "←" },
+                      { "type": "button", "className": "text-xs px-2 py-1 bg-green-50 text-green-600 rounded", "onClick": "() => moveTask(task.id, 'done')", "label": "Done ➔" }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "div",
+            "className": "bg-gray-100 dark:bg-gray-800 p-4 rounded-xl",
+            "children": [
+              { "type": "h2", "className": "font-bold text-gray-700 dark:text-gray-300 mb-4", "text": "Done" },
+              {
+                "type": "div",
+                "map": { "over": "tasks.filter(t => t.status === 'done')", "as": "task" },
+                "key": "task.id",
+                "className": "bg-white dark:bg-gray-700 p-3 rounded-lg shadow-sm mb-3 flex justify-between items-center opacity-70",
+                "children": [
+                  { "type": "span", "className": "text-sm text-gray-800 dark:text-gray-200 line-through", "text": "{task.title}" },
+                  { "type": "button", "className": "text-xs px-2 py-1 text-gray-500 hover:bg-gray-100 rounded", "onClick": "() => moveTask(task.id, 'doing')", "label": "← Reopen" }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

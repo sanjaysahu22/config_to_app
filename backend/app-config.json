@@ -1,0 +1,42 @@
+{
+  "entities": {
+    "users": {
+      "fields": {
+        "id": "uuid",
+        "name": "string",
+        "email": "string"
+      }
+    },
+    "tasks": {
+      "fields": {
+        "id": "uuid",
+        "title": "string",
+        "status": "string"
+      }
+    }
+  },
+  "ui": {
+    "pages": [
+      {
+        "path": "/",
+        "title": "Admin Dashboard",
+        "components": [
+          {
+            "type": "header",
+            "text": "Welcome to Dynamic App!"
+          },
+          {
+            "type": "table",
+            "entity": "users",
+            "columns": ["name", "email"]
+          },
+          {
+            "type": "form",
+            "entity": "tasks",
+            "fields": ["title", "status"]
+          }
+        ]
+      }
+    ]
+  }
+}
