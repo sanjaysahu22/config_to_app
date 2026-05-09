@@ -22,6 +22,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+// Handle preflight (OPTIONS) for all routes using a regex to avoid path-to-regexp '*' bug
+app.options(/.*/, cors(corsOptions));
 app.use(express.json());
 
 // 1. Initialize DB pool
