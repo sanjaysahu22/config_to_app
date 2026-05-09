@@ -7,7 +7,15 @@ const path = require('path');
 const crypto = require('crypto');
 
 const app = express();
-app.use(cors());
+const corsOptions = {
+  origin: true, // reflect request origin (allow all)
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 
 // 1. Initialize DB pool
