@@ -9,48 +9,23 @@ const crypto = require('crypto');
 const app = express();
 
 const corsOptions = {
-  origin: function (origin, callback) {
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'https://configtoapp-production.up.railway.app',
-    ];
-    // Allow requests with no origin (mobile apps, curl, etc.)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true, // ✅ Allow ALL origins
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  optionsSuccessStatus: 200, // Some browsers choke on 204
+  optionsSuccessStatus: 200,
 };
 
-// ✅ Apply CORS globally FIRST — before anything else
+// ✅ Apply CORS globally
 app.use(cors(corsOptions));
 
-// ✅ Handle ALL preflight OPTIONS requests globally, before routers
-app.options('*', cors(corsOptions));
-
-app.use(express.json());
-
-// ✅ Fallback safety net — manually set headers in case cors middleware is bypassed
+// ✅ Handle preflight via middleware (avoids path-to-regexp v8 '*' bug)
 app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  const allowedOrigins = [
-    'http://localhost:3000',
-    'https://configtoapp-production.up.railway.app',
-  ];
-  if (origin && allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With');
 
-  // Respond immediately to OPTIONS so no router intercepts it
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
   }
@@ -58,13 +33,13 @@ app.use((req, res, next) => {
   next();
 });
 
-// Initialize DB pool
+app.use(express.json());
+
 const pool = new Pool({
   connectionString:
     process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/dynamic_db',
 });
 
-// Keep generated runtimes outside backend/ so nodemon does not restart mid-request.
 const PROJECTS_DIR = path.join(__dirname, '../../generated-projects');
 
 function ensureDir(dirPath) {
@@ -90,12 +65,10 @@ function pickRunnableBackendFiles(allFiles) {
 
 async function startServer() {
   try {
-    // ✅ Mount apiRouter with cors applied again at the router level
     const apiRouter = require('./routes/api').default;
-    app.use('/api', cors(corsOptions), apiRouter);
+    app.use('/api', apiRouter);
 
-    // Generate endpoint
-    app.post('/api/generate', cors(corsOptions), async (req, res) => {
+    app.post('/api/generate', async (req, res) => {
       try {
         const warnings = [];
         const { validateAndCorrectConfig } = require('./engine/pipeline/aiValidator');
@@ -123,12 +96,9 @@ async function startServer() {
         const { buildPreviewHTML } = require('./engine/pipeline/preview-builder');
         const { spawnGeneratedServer } = require('./services/processManager');
 
-        // Get the frontend-only result to extract the raw generated 'code' for the preview builder
         const frontendResult = generateComponent(config);
-        // Get the fullstack combined files
         const combinedResult = combineGenerators(config);
 
-        // Materialize and run generated backend so preview can call real APIs.
         const projectHash = crypto
           .createHash('sha1')
           .update(JSON.stringify(req.body))
@@ -157,7 +127,6 @@ async function startServer() {
           runtimeWarnings.push(`[runtime] Generated backend failed to start: ${msg}`);
         }
 
-        // Build preview HTML
         let previewHtml;
         try {
           previewHtml = buildPreviewHTML({
@@ -206,7 +175,6 @@ async function startServer() {
       }
     });
 
-    // Boot Up
     const port = process.env.PORT || 3001;
     app.listen(port, () => {
       console.log(`🚀 Dynamic Backend running on http://localhost:${port}`);
