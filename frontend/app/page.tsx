@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLanguage, type Language } from '../lib/language-context'
+import { getBackendApiUrl } from '../lib/backend-url'
 
 export default function Home() {
   const [config, setConfig] = useState<any>(null)
@@ -14,7 +15,7 @@ export default function Home() {
     const token = localStorage.getItem('token')
     setIsLoggedIn(!!token)
 
-    fetch('http://localhost:3001/api/config')
+    fetch(getBackendApiUrl('/api/config'))
       .then((res) => {
         if (res.ok) return res.json()
         throw new Error('No config')

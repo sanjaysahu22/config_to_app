@@ -1,5 +1,6 @@
 // app/api/generate/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { getBackendApiUrl } from '../../../lib/backend-url';
 
 export async function POST(req: NextRequest) {
   let rawBody: unknown;
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const backendRes = await fetch("http://localhost:3001/api/generate", {
+    const backendRes = await fetch(getBackendApiUrl('/api/generate'), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(rawBody),

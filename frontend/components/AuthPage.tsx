@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLanguage, type Language } from '../lib/language-context'
+import { getBackendApiUrl } from '../lib/backend-url'
 
 type AuthMode = 'login' | 'register'
 
@@ -45,8 +46,8 @@ export default function AuthPage({ mode }: AuthPageProps) {
     setLoading(true)
 
     const endpoint = mode === 'login'
-      ? 'http://localhost:3001/api/login'
-      : 'http://localhost:3001/api/register'
+      ? getBackendApiUrl('/api/login')
+      : getBackendApiUrl('/api/register')
 
     try {
       const response = await fetch(endpoint, {
