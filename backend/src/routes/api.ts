@@ -21,4 +21,9 @@ router.post('/generatebyprompt', requireAuth, generateByPrompt as any);
 router.get('/configs', requireAuth, getAllConfigs as any);
 router.get('/configs/:id', requireAuth, getConfigById as any);
 
+// Public config/ping route for frontend wakeup
+router.get('/config', (req, res) => {
+  res.json({ status: 'ok', message: 'Backend is awake' });
+});
+
 export default router;
