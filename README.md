@@ -45,11 +45,6 @@ Create `frontend/.env.local`:
 NEXT_PUBLIC_BACKEND_URL=http://localhost:3001
 ```
 
-For production (Railway backend):
-
-```env
-NEXT_PUBLIC_BACKEND_URL=https://configtoapp-production.up.railway.app
-```
 
 ---
 
